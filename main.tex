@@ -14,6 +14,7 @@
 \usepackage{indentfirst}
 \usepackage{sectsty}
 \usepackage{hyperref}
+\usepackage{listings}
 
 
 
@@ -107,8 +108,235 @@ Controller do wygenerowania nowego hasła
 \subsubsection{usersController.js}
 Tworzymy nowego użytkownika oraz modyfikujemy jego dane personalne
 
+\newpage
+\subsection{Katalog lib}
+Katalog z bibliotekami
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{lib.png}
+\caption{lib katalog}
+\label{fig:obrazek lib}
+\end{figure}
+
+\subsubsection{password.js}
+Generujemy hash z hasła oraz sprawdzamy czy hasło jest poprawne 
+
+\subsection{Katalog models}
+Katalog z modelami bazy danych
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{models.png}
+\caption{models katalog}
+\label{fig:obrazek models}
+\end{figure}
+
+\subsubsection{courtModel.js}
+
+\begin{lstlisting}[
+  language={JavaScript},
+  caption={courtModel}
+]const mongoose = require('mongoose');
+
+const courtModel = mongoose.Schema({
+  ids: {
+    type: String,
+    required: true,
+  },
+  nameCourt: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  date: [
+    {
+      nameOfDay: String,
+      value: Boolean,
+    },
+  ],
+});
+module.exports = mongoose.model('courtModel', courtModel);
 
 
+\end{lstlisting}
+
+Model Court składa się z:
+\begin{itemize}
+  \item ids (id)
+  \item nameCourt (nazwa obiektu)
+  \item description (część boiska)
+  \item date (data w którym dniu boisko jest dostępne)
+\end{itemize}
+
+
+\subsubsection{reservationModel.js}
+
+\begin{lstlisting}[
+  language={JavaScript},
+  caption={courtModel}
+]
+const { ObjectID, ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
+
+const reservationModel = mongoose.Schema({
+  start_time: {
+    type: String,
+    required: true,
+  },
+  hour: {
+    type: String,
+    required: true,
+  },
+  courtId: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: ObjectId,
+    ref: 'userModel',
+    required: true,
+  },
+});
+module.exports = mongoose.model('reservationModel', reservationModel);
+
+
+
+\end{lstlisting}
+
+Model Reservation składa się z:
+\begin{itemize}
+  \item start\_time (kiedy rezerwacja zaczyna się)
+  \item hour (ile godzin trwa)
+  \item courtId (id boiska)
+  \item userId (id usera)
+\end{itemize}
+
+\subsubsection{tariffModel.js}
+
+\begin{lstlisting}[
+  language={JavaScript},
+  caption={courtModel}
+]
+const mongoose = require('mongoose');
+
+const courtsTariff = mongoose.Schema({
+  ids: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  classes_and_sports_training: {
+    type: String,
+    required: true,
+  },
+  tournament_matches: {
+    type: String,
+    required: true,
+  },
+  university_club: {
+    type: String,
+    required: true,
+  },
+});
+module.exports = mongoose.model('courtsTariff', courtsTariff);
+
+\end{lstlisting}
+
+Model tariff składa się z:
+\begin{itemize}
+  \item ids (id)
+  \item name (nazwa obiektu)
+  \item classes\_and\_sports\_training (jeden z typów cennika)
+  \item tournament\_matches (jeden z typów cennika)
+  \item university\_club (jeden z typów cennika)
+\end{itemize}
+
+
+\subsubsection{userModel.js}
+
+\begin{lstlisting}[
+  language={JavaScript},
+  caption={courtModel}
+]
+const mongoose = require('mongoose');
+
+const userModel = mongoose.Schema({
+  email: String,
+  hash: String,
+  salt: String,
+  idUsos: String, //usos
+  student_status: String, //usos
+  student_number: String, //usos
+  name: String,
+  surname: String,
+  age: Number,
+  phone_number: String,
+  sex: String,
+  role: {
+    type: String,
+    default: 'user',
+  },
+  adress_street: String,
+  adress_city: String,
+  adress_postalCode: String,
+  isStudent: {
+    type: Boolean,
+    default: false,
+  }, //usos
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  nip: String,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+});
+
+module.exports = mongoose.model('userModel', userModel);
+
+\end{lstlisting}
+
+Model user składa się z:
+\begin{itemize}
+  \item email (email użytkownika)
+  \item hash (hash hasła)
+  \item salt (sól do hasła)
+  \item idUsos (id użytkownika podczas logowania poprzez CAS)
+  \item student\_status (czy jest studentem aktywnym)
+  \item name (imie użytkownika)
+  \item surname (nazwisko użytkownika)
+  \item age (wiek użytkownika)
+  \item phone\_number (numer telefonu użytkownika)
+  \item sex (płeć użytkownika)
+  \item role (admin czy użytkownik)
+  \item adress\_street (miejsce zamieszkania użytkownika - ulica)
+  \item adress\_city (miejsce zamieszkania użytkownika - miasto)
+  \item adress\_postalCode (miejsce zamieszkania użytkownika - kod pocztowy)
+  \item isStudent (czy zalogowany poprzez CAS)
+  \item isActive (czy użytkownika ma nadal aktywne konto)
+  \item nip (NIP użytkownika)
+  \item resetPasswordToken (token do resetowania hasła)
+  \item resetPasswordExpires (czas w którym możemy zresetować hasło)
+  
+\end{itemize}
+
+\newpage
+\subsection{Katalog routes}
+Katalog z modelami bazy danych
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{routes.png}
+\caption{routes katalog}
+\label{fig:obrazek routes}
+\end{figure}
 
 
 
