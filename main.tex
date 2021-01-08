@@ -338,7 +338,231 @@ Katalog z modelami bazy danych
 \label{fig:obrazek routes}
 \end{figure}
 
+\subsubsection{admin.js}
 
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/admin & Spradzanie czy zalogowany jako admin\\
+\hline
+GET & /api/admin/users & Zwraca wszystkich użytkowników\\
+\hline
+GET & /api/admin/users/:userId & Zwraca usera o podanym ID\\
+\hline
+GET & /api/admin/reservations & Zwraca usera o podanym ID\\
+\hline
+DELETE & /api/admin/reservations/:id & Usuwa rezerwajce o podanym ID\\
+\hline
+POST & /api/admin/reservations & Tworzenie rezerwacji przez administratora\\
+\hline
+\end{tabular}
+
+
+\subsubsection{authMiddleware.js}
+Middleware potrzebne do sprawdzania role użytkownika, oraz do wyświetlania danych w panelu administratora
+
+\subsubsection{courts.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/admin/courts & Zwraca podział boiska dla administratora\\
+\hline
+GET & /api/courts & Zwraca podział boiska\\
+\hline
+POST & /api/admin/courts & Tworzenie boiska w panelu administratora\\
+\hline
+DELETE & /api/admin/courts/:courtId & Usuwanie boiska o danym ID\\
+\hline
+PATCH & /api/admin/courts/:courtId & Aktualizacja boiska\\
+\hline
+GET & /api/admin/courts/:courtId & Zwraca boisko/strefę o podanym ID\\
+\hline
+\end{tabular}
+
+\subsubsection{forgotPassword.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+POST & /api/forgotPassword & Zapomniane hasło\\
+\hline
+
+\end{tabular}
+
+\subsubsection{login.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+POST & /api/login/ & Logowanie do panelu administratora\\
+\hline
+POST & /api/login/:role & Logowanie do aplikacji\\
+\hline
+GET & /api/logout & Wylogowanie\\
+\hline
+
+\end{tabular}
+
+\subsubsection{loginUsos.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/loginUsos & Logowanie przez CAS\\
+\hline
+GET & /api/loginUsos/connect & Logowanie przez CAS\\
+\hline
+GET & /api/loginUsos/callback & Callback przy logowaniu przez CAS\\
+\hline
+GET & /api/loginUsos/logout & Wylogowanie użytkownika przy logowaniu przez CAS\\
+\hline
+
+\end{tabular}
+
+\subsubsection{payment.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+POST & /api/getToken & Generowanie tokenu do płatności\\
+\hline
+POST & /api/createPayment & Tworzenie płatności\\
+\hline
+POST & /notify & Powiadomienia o sukcesie czy porażce przy dokonowaniu płatności\\
+\hline
+GET & /getPaymentInfo/:orderId & Infromacje o zamówieniu o podanym ID\\
+\hline
+
+\end{tabular}
+
+\subsubsection{reservations.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/reservations & Zwraca wszystkie rezerwacje\\
+\hline
+POST & /api/reservations/getPrice & Cena dla danej rezerwacji\\
+\hline
+GET & /api/allReservations & Wszystkie rezerwacje\\
+\hline
+POST & /api/reservation/create & Tworzenie rezerwacji\\
+\hline
+POST & /api/reservation/create/groups & Tworzenie grupowych rezerwacji\\
+\hline
+DELETE & /api/reservation/delete/:reservationId & Usuwanie rezerwacji o podanym ID\\
+\hline
+PATCH & /api/reservation/update/:reservationId & Aktualizacja rezerwacji o podanym ID\\
+\hline
+GET & /api/reservation/:reservationId & Zwraca rezerwacje o podanym ID\\
+\hline
+GET & /api/reservations/:userId & Rezerwacje danego użytkownika\\
+\hline
+
+\end{tabular}
+
+\subsubsection{resetPassword.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/reset & Resetowanie hasła\\
+\hline
+
+\end{tabular}
+
+\subsubsection{tariff.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/admin/priceLists & Zwraca podział cen na wszystkie obiekty\\
+\hline
+GET & /api/admin/priceLists/:id &  Cena o podanym ID\\
+\hline
+PUT & /api/admin/priceLists/:id &  Update cennika\\
+\hline
+GET & /api/priceLists &  Zwraca podział cen na wszystkie obiekty dla aplikacji frontendowej\\
+\hline
+
+\end{tabular}
+
+\subsubsection{updatePasswordViaEmail.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+PATCH & /api/updatePasswordViaEmail & Ustawia nowe hasło\\
+\hline
+
+\end{tabular}
+
+\subsubsection{user.js}
+\begin{tabular}{l12}
+
+\hline
+\textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
+\hline
+GET & /api/checkAuthUser & Sprawdzamy czy użytkownik ma autoryzację\\
+\hline
+POST & /api/user/create & Tworzenie nowego użytkownika\\
+\hline
+PATCH & /api/user/update & Aktualizacja danych użytkownika\\
+\hline
+GET & /api/user/:userId & Zwraca użytkownika o podanym ID\\
+\hline
+
+\end{tabular}
+
+\newpage
+\subsection{Katalog swagger}
+Katalog z plikami do tworzenia dokumentacji online projektu
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{swagger.png}
+\caption{swagger katalog}
+\label{fig:obrazek swagger}
+\end{figure}
+
+\subsection{Plik .env}
+W tym pliku umieszczamy potrzebne zmienne, klucze, ustawienia których nie chcemy udostępniać w kodzie. Plik musi być utworzony przed pierwszym uruchomieniem projektu.
+
+\begin{lstlisting}[
+  language={JavaScript},
+  caption={courtModel}
+]
+DB_CONNECTION = ''
+DB_CONNECTION_PROD = ''
+DB_CONNECTION_ATLAS = ''
+DB_CONNECTION_ATLAS_TEST = ''
+NODE_ENV = ''
+USOS_CONSUMER_KEY = ''
+USOS_CONSUMER_SECRET = ''
+OAUTH_SECRET = ''
+ROLE_ADMIN = ''
+ROLE_USER = ''
+EMAIL_ADDRESS = ''
+EMAIL_PASSWORD = ''
+PAYU_CLIENT_ID = ''
+PAYU_CLIENT_SECRET = ''
+
+\end{lstlisting}
+
+\subsection{Plik app.js}
+Główny plik projektu w którym umieszczamy niezbędne konfiguracje
 
 
 
