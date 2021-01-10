@@ -26,11 +26,11 @@
 \section*{Wstęp}
 \addcontentsline{toc}{section}{Wstęp}
 
-Głównym założeniem tej aplikacji jest rezerwowane boiska za pomocą strony internetowej. Zapewnia nam ona logowanie poprzez CAS. Cały projekt składa się z 
+Głównym założeniem  aplikacji jest rezerwowanie boiska za pomocą strony internetowej. Zapewnia logowanie lokalne oraz  poprzez CAS. Cały projekt składa się z 
 \begin{itemize}
   \item Aplikacji Bacekndowej opatej o Node.js
   \item Aplikacji frontendowej opartej o React.js
-  \item Aplikacji frontendowej (administrator) opartej o ReactAdmin.js
+  \item Aplikacji frontendowej dla administratora opartej o ReactAdmin.js
 \end{itemize}
 
 Aplikacja korzysta z architektury REST oraz jest dostosowana do urządzeń mobilnych
@@ -45,7 +45,7 @@ Aplikacja korzysta z architektury REST oraz jest dostosowana do urządzeń mobil
 \label{fig:obrazek struktura}
 \end{figure}
 
-\indent Część backendu w aplikacji do zarządzania boiskiem szkolnym jest napisany w języku JavaScript oparta o framework Express.js.
+\indent Część backendowa w aplikacji do zarządzania boiskiem szkolnym jest napisany w języku JavaScript oparta o framework Express.js.
 
 
 \subsection{Katalog config}
@@ -57,12 +57,13 @@ W tym katalogu mieszczą się dwa pliki
 \label{fig:obrazek config}
 \end{figure}
 \subsubsection{database.js}
-Ustawiamy z której bazy danych chcemy korzystać. Ustala się to zmienną NODE\_ENV w pliku .env
+
+Odpowiada za połączenie z odpowiednią bazą danych na podstawie zmiennej NODE\_ENV , która znajduje się w pliku .env  
 \subsubsection{passport.js}
-Zawierają się tam wszystkie ustawienia od autoryzacji użytkownika (CAS oraz logowanie niezależne)
+Zawiera implmentację  autoryzacji użytkownika poprzec CAS oraz logowanie lokalne
 
 \subsection{Katalog controllers}
-Katalog zawiera pliki które zawierają funkcje służące do działania całej aplikacji, są one eksportowane i podpinane pod ścieżki w folderze routes
+Katalog zawiera pliki które zawierają funkcje służące do działania całej aplikacji, są one eksportowane i podpinane do ścieżek w folderze routes
 
 \begin{figure}[h]
 \centering
@@ -75,38 +76,38 @@ Katalog zawiera pliki które zawierają funkcje służące do działania całej 
 Plik ten zawiera wszystkie funkcje, potrzebne to zarządzania aplikacją frontedową przez administratora systemu. 
 
 \subsubsection{courtController.js}
-Tworzymy tutaj rozkład boiska który chcemy aby był dostępny dla naszych klientów
+Funkcja odpowiadająca za informowanie frontedu o dostępnych sektorach
 
 \subsubsection{forgotPasswordController.js}
-Funkcje odpowiedzialne za przypominanie hasła
+Funkcje odpowiedzialne za zresetowanie hasła
 
 \subsubsection{loginController.js}
 Logowanie i wylogowywanie użytkownika z aplikacji (outh)
 
 \subsubsection{loginUsosController.js}
 Logowanie i wylogowywanie użytkownika z aplikacji (CAS) \\
-Link do dokuemntacji: \url{https://apps.usos.edu.pl/developers/api/}
+Link do dokumentacji: \url{https://apps.usos.edu.pl/developers/api/}
 
 \subsubsection{paginationAdmin.js}
-Middleware do aplikacji adminstratora pomagające ustalić podział rekordów na strony
+Middleware dla aplikacji adminstratora ustalające liczbe rekordów po filtrowaniu oraz ustawia nagłówek Content-Range, który react-admin wymaga do wyświetlenia danych.
 
 \subsubsection{paymentController.js}
-Metody odpowiedzialne za wytworzenie tokenu w serwisie Pay'u oraz dokonanie płatności
+Metody odpowiedzialne za odebranie tokenu z serwisu Pay'u oraz dokonanie płatności
 
 \subsubsection{reservationController.js}
-Controller odpowiedzialny za tworzenie rezerwacji, modyfikacji, usuwania.
+Kontroler odpowiedzialny za tworzenie i zwrócenie infomracji o rezerwacji/rezerwacjach.
 
 \subsubsection{resetPasswordController.js}
-Sprawdzenie czy możemy ustawić nowe hasło
+Funkcja sprawdzająca dostępność zmiany hasła
 
 \subsubsection{tariffController.js}
-Dodawanie, modyfikowanie i usuwanie cennika obiektu
+Dodawanie, modyfikowanie i usuwanie cennika
 
 \subsubsection{updatePasswordViaEmailController.js}
-Controller do wygenerowania nowego hasła
+Kontrolerr do generowania nowego hasła
 
 \subsubsection{usersController.js}
-Tworzymy nowego użytkownika oraz modyfikujemy jego dane personalne
+Tworzenie nowego użytkownika oraz modyfikacja jego danych personalnnych
 
 \newpage
 \subsection{Katalog lib}
@@ -120,7 +121,7 @@ Katalog z bibliotekami
 \end{figure}
 
 \subsubsection{password.js}
-Generujemy hash z hasła oraz sprawdzamy czy hasło jest poprawne 
+Generowanie hash z hasła oraz sprawdzenie czy hasło jest poprawne 
 
 \subsection{Katalog models}
 Katalog z modelami bazy danych
@@ -137,8 +138,7 @@ Katalog z modelami bazy danych
 \begin{lstlisting}[
   language={JavaScript},
   caption={courtModel}
-]const mongoose = require('mongoose');
-
+]
 const courtModel = mongoose.Schema({
   ids: {
     type: String,
@@ -159,8 +159,6 @@ const courtModel = mongoose.Schema({
     },
   ],
 });
-module.exports = mongoose.model('courtModel', courtModel);
-
 
 \end{lstlisting}
 
@@ -168,8 +166,8 @@ Model Court składa się z:
 \begin{itemize}
   \item ids (id)
   \item nameCourt (nazwa obiektu)
-  \item description (część boiska)
-  \item date (data w którym dniu boisko jest dostępne)
+  \item description (opis boiska)
+  \item date (Lista dni tygodnia, w którym boisko jest dostępne)
 \end{itemize}
 
 
@@ -177,11 +175,8 @@ Model Court składa się z:
 
 \begin{lstlisting}[
   language={JavaScript},
-  caption={courtModel}
+  caption={reservationModel}
 ]
-const { ObjectID, ObjectId } = require('mongodb');
-const mongoose = require('mongoose');
-
 const reservationModel = mongoose.Schema({
   start_time: {
     type: String,
@@ -200,17 +195,23 @@ const reservationModel = mongoose.Schema({
     ref: 'userModel',
     required: true,
   },
+  vat: {
+    type: Boolean,
+    default: false,
+  },
+  isServedVat: {
+    type: Boolean,
+    default: false,
+  },
 });
-module.exports = mongoose.model('reservationModel', reservationModel);
-
 
 
 \end{lstlisting}
 
 Model Reservation składa się z:
 \begin{itemize}
-  \item start\_time (kiedy rezerwacja zaczyna się)
-  \item hour (ile godzin trwa)
+  \item start\_time (data rezerwacji)
+  \item hour (od której godziny)
   \item courtId (id boiska)
   \item userId (id usera)
 \end{itemize}
@@ -219,10 +220,8 @@ Model Reservation składa się z:
 
 \begin{lstlisting}[
   language={JavaScript},
-  caption={courtModel}
+  caption={tariffModel}
 ]
-const mongoose = require('mongoose');
-
 const courtsTariff = mongoose.Schema({
   ids: {
     type: String,
@@ -245,7 +244,6 @@ const courtsTariff = mongoose.Schema({
     required: true,
   },
 });
-module.exports = mongoose.model('courtsTariff', courtsTariff);
 
 \end{lstlisting}
 
@@ -263,17 +261,16 @@ Model tariff składa się z:
 
 \begin{lstlisting}[
   language={JavaScript},
-  caption={courtModel}
+  caption={userModel}
 ]
-const mongoose = require('mongoose');
 
 const userModel = mongoose.Schema({
   email: String,
   hash: String,
   salt: String,
-  idUsos: String, //usos
-  student_status: String, //usos
-  student_number: String, //usos
+  idUsos: String, 
+  student_status: String, 
+  student_number: String, 
   name: String,
   surname: String,
   age: Number,
@@ -289,7 +286,7 @@ const userModel = mongoose.Schema({
   isStudent: {
     type: Boolean,
     default: false,
-  }, //usos
+  }, 
   isActive: {
     type: Boolean,
     default: true,
@@ -299,7 +296,6 @@ const userModel = mongoose.Schema({
   resetPasswordExpires: Date,
 });
 
-module.exports = mongoose.model('userModel', userModel);
 
 \end{lstlisting}
 
@@ -308,19 +304,19 @@ Model user składa się z:
   \item email (email użytkownika)
   \item hash (hash hasła)
   \item salt (sól do hasła)
-  \item idUsos (id użytkownika podczas logowania poprzez CAS)
+  \item idUsos (id użytkownika zwrócone z systemu CAS)
   \item student\_status (czy jest studentem aktywnym)
   \item name (imie użytkownika)
   \item surname (nazwisko użytkownika)
   \item age (wiek użytkownika)
   \item phone\_number (numer telefonu użytkownika)
   \item sex (płeć użytkownika)
-  \item role (admin czy użytkownik)
+  \item role (admin lub użytkownik)
   \item adress\_street (miejsce zamieszkania użytkownika - ulica)
   \item adress\_city (miejsce zamieszkania użytkownika - miasto)
   \item adress\_postalCode (miejsce zamieszkania użytkownika - kod pocztowy)
-  \item isStudent (czy zalogowany poprzez CAS)
-  \item isActive (czy użytkownika ma nadal aktywne konto)
+  \item isStudent (czy jest studentem, ustalane przy logowaniu poprzez CAS)
+  \item isActive (czy użytkownik ma aktywne konto)
   \item nip (NIP użytkownika)
   \item resetPasswordToken (token do resetowania hasła)
   \item resetPasswordExpires (czas w którym możemy zresetować hasło)
@@ -329,7 +325,7 @@ Model user składa się z:
 
 \newpage
 \subsection{Katalog routes}
-Katalog z modelami bazy danych
+Katalog ze ścieżkami
 
 \begin{figure}[h]
 \centering
@@ -344,24 +340,44 @@ Katalog z modelami bazy danych
 
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
-\hline
-GET & /api/admin & Spradzanie czy zalogowany jako admin\\
+
 \hline
 GET & /api/admin/users & Zwraca wszystkich użytkowników\\
 \hline
 GET & /api/admin/users/:userId & Zwraca usera o podanym ID\\
 \hline
-GET & /api/admin/reservations & Zwraca usera o podanym ID\\
+GET & /api/admin/reservations & Zwraca wszystkie rezerwacje\\
+\hline
+GET & /api/admin/reservations/:id & Zwraca rezerwajcę o podanym ID\\
 \hline
 DELETE & /api/admin/reservations/:id & Usuwa rezerwajce o podanym ID\\
 \hline
-POST & /api/admin/reservations & Tworzenie rezerwacji przez administratora\\
+POST & /api/admin/reservations & Tworzenie rezerwacji jako administrator\\
+\hline
+GET & /api/admin/courts & Zwraca podział boiska dla administratora\\
+\hline
+POST & /api/admin/courts & Tworzenie boiska w panelu administratora\\
+\hline
+DELETE & /api/admin/courts/:courtId & Usuwanie boiska o danym ID\\
+\hline
+PATCH & /api/admin/courts/:courtId & Modyfikacja boiska\\
+\hline
+GET & /api/admin/courts/:courtId & Zwraca boisko/strefę o podanym ID\\
+\hline
+POST & /api/admin/tariff & Tworzenie cennika\\
+\hline
+GET & /api/admin/priceLists & Zwraca podział cen na wszystkie obiekty\\
+\hline
+GET & /api/admin/priceLists/:id &  Cena o podanym ID\\
+\hline
+PUT & /api/admin/priceLists/:id &  Modyfikacja cennika\\
+\hline
 \hline
 \end{tabular}
 
 
 \subsubsection{authMiddleware.js}
-Middleware potrzebne do sprawdzania role użytkownika, oraz do wyświetlania danych w panelu administratora
+Middleware odpowiedzialne za zabezpieczenia ścieżek przed nieautoryzowanym odpytywaniem serwera
 
 \subsubsection{courts.js}
 \begin{tabular}{l12}
@@ -369,18 +385,8 @@ Middleware potrzebne do sprawdzania role użytkownika, oraz do wyświetlania dan
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
 \hline
-GET & /api/admin/courts & Zwraca podział boiska dla administratora\\
-\hline
 GET & /api/courts & Zwraca podział boiska\\
-\hline
-POST & /api/admin/courts & Tworzenie boiska w panelu administratora\\
-\hline
-DELETE & /api/admin/courts/:courtId & Usuwanie boiska o danym ID\\
-\hline
-PATCH & /api/admin/courts/:courtId & Aktualizacja boiska\\
-\hline
-GET & /api/admin/courts/:courtId & Zwraca boisko/strefę o podanym ID\\
-\hline
+
 \end{tabular}
 
 \subsubsection{forgotPassword.js}
@@ -400,9 +406,9 @@ POST & /api/forgotPassword & Zapomniane hasło\\
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
 \hline
-POST & /api/login/ & Logowanie do panelu administratora\\
+POST & /api/login/:role & Logowanie do panelu administratora\\
 \hline
-POST & /api/login/:role & Logowanie do aplikacji\\
+POST & /api/login/ & Logowanie do aplikacji\\
 \hline
 GET & /api/logout & Wylogowanie\\
 \hline
@@ -414,14 +420,13 @@ GET & /api/logout & Wylogowanie\\
 
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
-\hline
-GET & /api/loginUsos & Logowanie przez CAS\\
+
 \hline
 GET & /api/loginUsos/connect & Logowanie przez CAS\\
 \hline
-GET & /api/loginUsos/callback & Callback przy logowaniu przez CAS\\
+GET & /api/loginUsos/callback & Callback  logowania przez CAS\\
 \hline
-GET & /api/loginUsos/logout & Wylogowanie użytkownika przy logowaniu przez CAS\\
+GET & /api/loginUsos/logout & Wylogowanie użytkownika przez CAS\\
 \hline
 
 \end{tabular}
@@ -432,7 +437,7 @@ GET & /api/loginUsos/logout & Wylogowanie użytkownika przy logowaniu przez CAS\
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
 \hline
-POST & /api/getToken & Generowanie tokenu do płatności\\
+POST & /api/getToken & Odbiór tokenu z PAY`U\\
 \hline
 POST & /api/createPayment & Tworzenie płatności\\
 \hline
@@ -449,23 +454,13 @@ GET & /getPaymentInfo/:orderId & Infromacje o zamówieniu o podanym ID\\
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
 \hline
-GET & /api/reservations & Zwraca wszystkie rezerwacje\\
+GET & /api/reservations & Zwraca wszystkie rezerwację niedostępne do rezerwacji\\
 \hline
-POST & /api/reservations/getPrice & Cena dla danej rezerwacji\\
+POST & /api/reservations/getPrice & Wylicza koszt całej rezerwacji\\
 \hline
-GET & /api/allReservations & Wszystkie rezerwacje\\
+POST & /api/reservation/create/groups & Tworzenie rezerwacji\\
 \hline
-POST & /api/reservation/create & Tworzenie rezerwacji\\
-\hline
-POST & /api/reservation/create/groups & Tworzenie grupowych rezerwacji\\
-\hline
-DELETE & /api/reservation/delete/:reservationId & Usuwanie rezerwacji o podanym ID\\
-\hline
-PATCH & /api/reservation/update/:reservationId & Aktualizacja rezerwacji o podanym ID\\
-\hline
-GET & /api/reservation/:reservationId & Zwraca rezerwacje o podanym ID\\
-\hline
-GET & /api/reservations/:userId & Rezerwacje danego użytkownika\\
+GET & /api/reservations/:userId & Rezerwacje użytkownika o danym ID\\
 \hline
 
 \end{tabular}
@@ -486,12 +481,7 @@ GET & /api/reset & Resetowanie hasła\\
 
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
-\hline
-GET & /api/admin/priceLists & Zwraca podział cen na wszystkie obiekty\\
-\hline
-GET & /api/admin/priceLists/:id &  Cena o podanym ID\\
-\hline
-PUT & /api/admin/priceLists/:id &  Update cennika\\
+
 \hline
 GET & /api/priceLists &  Zwraca podział cen na wszystkie obiekty dla aplikacji frontendowej\\
 \hline
@@ -542,7 +532,7 @@ W tym pliku umieszczamy potrzebne zmienne, klucze, ustawienia których nie chcem
 
 \begin{lstlisting}[
   language={JavaScript},
-  caption={courtModel}
+  caption={.env}
 ]
 DB_CONNECTION = ''
 DB_CONNECTION_PROD = ''
@@ -552,17 +542,16 @@ NODE_ENV = ''
 USOS_CONSUMER_KEY = ''
 USOS_CONSUMER_SECRET = ''
 OAUTH_SECRET = ''
-ROLE_ADMIN = ''
-ROLE_USER = ''
 EMAIL_ADDRESS = ''
 EMAIL_PASSWORD = ''
 PAYU_CLIENT_ID = ''
 PAYU_CLIENT_SECRET = ''
+REACT_APP_SECRET = ''
 
 \end{lstlisting}
 
 \subsection{Plik app.js}
-Główny plik projektu w którym umieszczamy niezbędne konfiguracje
+Główny plik projektu, w którym umieszczona jest niezbędna konfiguracja
 
 
 
