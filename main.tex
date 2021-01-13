@@ -92,7 +92,9 @@ Link do dokumentacji: \url{https://apps.usos.edu.pl/developers/api/}
 Middleware dla aplikacji adminstratora ustalające liczbe rekordów po filtrowaniu oraz ustawia nagłówek Content-Range, który react-admin wymaga do wyświetlenia danych.
 
 \subsubsection{paymentController.js}
-Metody odpowiedzialne za odebranie tokenu z serwisu Pay'u oraz dokonanie płatności
+Metody odpowiedzialne za odebranie tokenu z 
+23
+ serwisu Pay'u oraz dokonanie płatności
 
 \subsubsection{reservationController.js}
 Kontroler odpowiedzialny za tworzenie i zwrócenie infomracji o rezerwacji/rezerwacjach.
@@ -375,9 +377,12 @@ PUT & /api/admin/priceLists/:id &  Modyfikacja cennika\\
 \hline
 \end{tabular}
 
-
+\newpage
 \subsubsection{authMiddleware.js}
-Middleware odpowiedzialne za zabezpieczenia ścieżek przed nieautoryzowanym odpytywaniem serwera
+Middleware odpowiedzialne za zabezpieczenia ścieżek przed 
+
+\newline
+nieautoryzowanym odpytywaniem serwera
 
 \subsubsection{courts.js}
 \begin{tabular}{l12}
@@ -528,7 +533,13 @@ Katalog z plikami do tworzenia dokumentacji online projektu
 \end{figure}
 
 \subsection{Plik .env}
-W tym pliku umieszczamy potrzebne zmienne, klucze, ustawienia których nie chcemy udostępniać w kodzie. Plik musi być utworzony przed pierwszym uruchomieniem projektu.
+W tym pliku umieszczamy potrzebne zmienne, klucze, ustawienia których 
+
+\newline
+nie chcemy udostępniać w kodzie. Plik musi być utworzony przed pierwszym
+
+\newline
+uruchomieniem projektu.
 
 \begin{lstlisting}[
   language={JavaScript},
@@ -553,6 +564,140 @@ REACT_APP_SECRET = ''
 \subsection{Plik app.js}
 Główny plik projektu, w którym umieszczona jest niezbędna konfiguracja
 
+\newpage
+\section{React-admin}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{struktura-admin.png}
+\caption{Struktura admina}
+\label{fig:obrazek struktura admina}
+\end{figure}
+
+\indent Część admina w aplikacji do zarządzania boiskiem szkolnym jest napisana z 
+
+\newline
+wykorzystaniem biblioteki react-admin w react.
+
+\subsection{Boiska}
+W katalogu Court mieszczą się pliki
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{court-admin.png}
+\caption{Katalog Court}
+\label{fig:obrazek Court}
+\end{figure}
+\subsubsection{CourtCreate}
+Komponent odpowiedzialny za tworzenie boiska
+
+\newline
+Wykorzystuje endpoint POST /api/admin/courts
+\subsubsection{CourtList}
+Komponent odpowiedzialny za wyświetlanie listy boisk
+
+\newline
+Wykorzystuje endpoint GET /api/admin/courts
+
+\subsection{Cennik}
+W katalogu PriceList mieszczą się pliki
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{price-admin.png}
+\caption{Katalog PriceList}
+\label{fig:obrazek PriceList}
+\end{figure}
+
+\subsubsection{EditPrice}
+Komponent odpowiedzialny za edycję cennika
+
+\newline
+Wykorzystuje endpoint PATCH /api/admin/priceLists/:id
+\subsubsection{PriceList}
+Komponent odpowiedzialny za wyświetlanie cennika
+
+\newline
+Wykorzystuje endpoint GET /api/admin/priceLists
+
+\subsection{Rezerwacje}
+W katalogu Reservations mieszczą się pliki
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{reservations-admin.png}
+
+\caption{Katalog Reservations}
+\label{fig:obrazek Reservations}
+\end{figure}
+
+\subsubsection{Constants}
+Stałe zmienne
+
+\subsubsection{CreateReservations}
+Komponent odpowiedzialny za tworzenie rezerwacji
+
+\newline
+Wykorzystuje endpoint POST /api/admin/reservations
+
+\subsubsection{EditReservations}
+Komponent odpowiedzialny za edycję rezerwacji
+
+\newline
+Wykorzystuje endpoint PATCH /api/admin/reservations/:id
+
+\subsubsection{FilterReservations}
+Komponent odpowiedzialny za filtrowanie rezerwacji
+
+\subsubsection{ReservationsList}
+Komponent odpowiedzialny za wyświetlenie listy rezerwacji
+
+\newline
+Wykorzystuje endpoint GET /api/admin/reservations
+
+\subsection{Użytkownicy}
+W katalogu Users mieszczą się pliki
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{users-admin.png}
+
+\caption{Katalog Users}
+\label{fig:obrazek Users}
+\end{figure}
+
+\subsubsection{Katalog invoicePDF}
+W tym katalogu znajduje się komponent odpowiedzialny za generowanie danych użytkownika do PDF z rezerwacji 
+
+\subsubsection{UsersList}
+Komponent odpowiedzialny za wyświetlenie użytkowników
+
+\newline
+Wykorzystuje endpoint GET /api/admin/users
+
+\subsubsection{UsersShow}
+Komponent odpowiedzialny za wyświetlenie szczegółowych danych
+
+\newline
+użytkownika.
+Wykorzystuje endpoint GET /api/admin/users/:id
+
+
+\subsection{Config}
+W katalogu Config mieści się plik
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{config-admin.png}
+
+\caption{Katalog Config}
+\label{fig:obrazek Config}
+\end{figure}
+
+\subsubsection{auth-prodiver}
+W katalogu auth-provider znajduje się komponenet odpowiedzialny
+
+\newline
+za logowanie.
+Wykorzystuje endpoint GET /api/login/admin
 
 \end{document}
