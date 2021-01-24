@@ -40,7 +40,7 @@ Aplikacja korzysta z architektury REST oraz jest dostosowana do urządzeń mobil
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{struktura.png}
+\includegraphics[width=0.5\textwidth]{server.png}
 \caption{Struktura backendu}
 \label{fig:obrazek struktura}
 \end{figure}
@@ -49,11 +49,11 @@ Aplikacja korzysta z architektury REST oraz jest dostosowana do urządzeń mobil
 
 
 \subsection{Katalog config}
-W tym katalogu mieszczą się dwa pliki
+W tym katalogu mieszczą się trzy pliki
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{config.png}
-\caption{config katalog}
+\caption{Katalog config}
 \label{fig:obrazek config}
 \end{figure}
 \subsubsection{database.js}
@@ -62,13 +62,16 @@ Odpowiada za połączenie z odpowiednią bazą danych na podstawie zmiennej NODE
 \subsubsection{passport.js}
 Zawiera implmentację  autoryzacji użytkownika poprzec CAS oraz logowanie lokalne
 
+\subsubsection{axios-config.js}
+Konfiguracja axios`a wykorzystywana podczas testów
+
 \subsection{Katalog controllers}
-Katalog zawiera pliki które zawierają funkcje służące do działania całej aplikacji, są one eksportowane i podpinane do ścieżek w folderze routes
+Katalog zawiera pliki które zawierają funkcje służące do działania całej aplikacji, są one eksportowane i podpinane do endpointów w folderze routes
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{controllers.png}
-\caption{controllers katalog}
+\caption{Katalog controllers}
 \label{fig:obrazek controllers}
 \end{figure}
 
@@ -88,13 +91,14 @@ Logowanie i wylogowywanie użytkownika z aplikacji (outh)
 Logowanie i wylogowywanie użytkownika z aplikacji (CAS) \\
 Link do dokumentacji: \url{https://apps.usos.edu.pl/developers/api/}
 
+\subsubsection{middleware.js}
+Middleware wykorzystywane do zabezpieczenia projektu
+
 \subsubsection{paginationAdmin.js}
 Middleware dla aplikacji adminstratora ustalające liczbe rekordów po filtrowaniu oraz ustawia nagłówek Content-Range, który react-admin wymaga do wyświetlenia danych.
 
 \subsubsection{paymentController.js}
-Metody odpowiedzialne za odebranie tokenu z 
-23
- serwisu Pay'u oraz dokonanie płatności
+Metody odpowiedzialne za odebranie tokenu z serwisu Pay'u oraz dokonanie płatności
 
 \subsubsection{reservationController.js}
 Kontroler odpowiedzialny za tworzenie i zwrócenie infomracji o rezerwacji/rezerwacjach.
@@ -113,17 +117,21 @@ Tworzenie nowego użytkownika oraz modyfikacja jego danych personalnnych
 
 \newpage
 \subsection{Katalog lib}
-Katalog z bibliotekami
+Katalog z konfiguracjami do bibliotek zewnętrznych
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{lib.png}
-\caption{lib katalog}
+\caption{Katalog lib}
 \label{fig:obrazek lib}
 \end{figure}
 
 \subsubsection{password.js}
 Generowanie hash z hasła oraz sprawdzenie czy hasło jest poprawne 
+
+\subsubsection{cronEmail.js}
+Automatyzacja procesu przypominania o dokonanej rezerwacji
+
 
 \subsection{Katalog models}
 Katalog z modelami bazy danych
@@ -131,7 +139,7 @@ Katalog z modelami bazy danych
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{models.png}
-\caption{models katalog}
+\caption{Katalog models}
 \label{fig:obrazek models}
 \end{figure}
 
@@ -142,10 +150,7 @@ Katalog z modelami bazy danych
   caption={courtModel}
 ]
 const courtModel = mongoose.Schema({
-  ids: {
-    type: String,
-    required: true,
-  },
+  nameObject: { type: String, required: true },
   nameCourt: {
     type: String,
     required: true,
@@ -160,16 +165,26 @@ const courtModel = mongoose.Schema({
       value: Boolean,
     },
   ],
+  sessionTime: {
+    type: String,
+  },
+  tariffId: {
+    type: ObjectId,
+    ref: 'courtsTariff',
+    required: true,
+  },
 });
 
 \end{lstlisting}
 
 Model Court składa się z:
 \begin{itemize}
-  \item ids (id)
-  \item nameCourt (nazwa obiektu)
+  \item nameObject (Nazwa obiektu)
+  \item nameCourt (nazwa sektora)
   \item description (opis boiska)
   \item date (Lista dni tygodnia, w którym boisko jest dostępne)
+  \item sessionTime (czas trwania rezerwacji)
+  \item tariffId (id cennika)
 \end{itemize}
 
 
@@ -180,16 +195,22 @@ Model Court składa się z:
   caption={reservationModel}
 ]
 const reservationModel = mongoose.Schema({
-  start_time: {
-    type: String,
-    required: true,
-  },
   hour: {
     type: String,
+  },
+  start: {
+    type: Date,
     required: true,
   },
-  courtId: {
+  dayString: {
     type: String,
+  },
+  end: {
+    type: Date,
+  },
+  courtId: {
+    type: ObjectId,
+    ref: 'courtModel',
     required: true,
   },
   userId: {
@@ -205,6 +226,22 @@ const reservationModel = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  paid: {
+    type: Boolean,
+    default: false,
+  },
+  orderId: {
+    type: String,
+  },
+  emailSent: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+  price: {
+    type: Number,
+  },
+  referId: String,
 });
 
 
@@ -212,10 +249,19 @@ const reservationModel = mongoose.Schema({
 
 Model Reservation składa się z:
 \begin{itemize}
-  \item start\_time (data rezerwacji)
-  \item hour (od której godziny)
+  \item start (data początkowa rezerwacji)
+  \item end (data końcowa rezerwacji)
+  \item dayString (data rezerwacji)
+  \item hour (godzina rezerwacji)
   \item courtId (id boiska)
   \item userId (id usera)
+  \item vat (czy użytkownik chce dostać fakture vat)
+  \item isServedVat (czy dane do faktury zostały wygenerowane do pdf)
+  \item paid (czy rezerwacja została opłacona)
+  \item orderId (id płatności PayU)
+  \item emailSent (czy przypomnienie o rezerwacji zostało wysłane)
+  \item price (cena rezerwacji)
+  \item referId (id rezerwacji z koszyka)
 \end{itemize}
 
 \subsubsection{tariffModel.js}
@@ -225,10 +271,6 @@ Model Reservation składa się z:
   caption={tariffModel}
 ]
 const courtsTariff = mongoose.Schema({
-  ids: {
-    type: String,
-    required: true,
-  },
   name: {
     type: String,
     required: true,
@@ -251,7 +293,6 @@ const courtsTariff = mongoose.Schema({
 
 Model tariff składa się z:
 \begin{itemize}
-  \item ids (id)
   \item name (nazwa obiektu)
   \item classes\_and\_sports\_training (jeden z typów cennika)
   \item tournament\_matches (jeden z typów cennika)
@@ -271,8 +312,8 @@ const userModel = mongoose.Schema({
   hash: String,
   salt: String,
   idUsos: String, 
-  student_status: String, 
-  student_number: String, 
+  studentStatus: String, 
+  studentNumber: String, 
   name: String,
   surname: String,
   age: Number,
@@ -282,9 +323,9 @@ const userModel = mongoose.Schema({
     type: String,
     default: 'user',
   },
-  adress_street: String,
-  adress_city: String,
-  adress_postalCode: String,
+  adressStreet: String,
+  adressCity: String,
+  adressPostalCode: String,
   isStudent: {
     type: Boolean,
     default: false,
@@ -294,8 +335,37 @@ const userModel = mongoose.Schema({
     default: true,
   },
   nip: String,
+  createDate: Date,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  firstLogin: {
+    type: Boolean,
+    default: true,
+  },
+  sumPrice: {
+    type: Number,
+  },
+  reservations: [
+    {
+      title: String,
+      start: Date,
+      dayString: String,
+      end: Date,
+      courtId: {
+        type: ObjectId,
+        ref: 'courtModel',
+        required: true,
+      },
+      nameCourt: String,
+      userId: String,
+      isPaid: Boolean,
+      price: Number,
+      vat: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
 });
 
 
@@ -307,21 +377,24 @@ Model user składa się z:
   \item hash (hash hasła)
   \item salt (sól do hasła)
   \item idUsos (id użytkownika zwrócone z systemu CAS)
-  \item student\_status (czy jest studentem aktywnym)
+  \item studentStatus (czy jest aktywnym studentem)
   \item name (imie użytkownika)
   \item surname (nazwisko użytkownika)
   \item age (wiek użytkownika)
   \item phone\_number (numer telefonu użytkownika)
   \item sex (płeć użytkownika)
   \item role (admin lub użytkownik)
-  \item adress\_street (miejsce zamieszkania użytkownika - ulica)
-  \item adress\_city (miejsce zamieszkania użytkownika - miasto)
-  \item adress\_postalCode (miejsce zamieszkania użytkownika - kod pocztowy)
+  \item adressStreet (miejsce zamieszkania użytkownika - ulica)
+  \item adressCcity (miejsce zamieszkania użytkownika - miasto)
+  \item adressPostalCode (miejsce zamieszkania użytkownika - kod pocztowy)
   \item isStudent (czy jest studentem, ustalane przy logowaniu poprzez CAS)
   \item isActive (czy użytkownik ma aktywne konto)
   \item nip (NIP użytkownika)
   \item resetPasswordToken (token do resetowania hasła)
   \item resetPasswordExpires (czas w którym możemy zresetować hasło)
+  \item firstLogin (czy jest pierwsze logowanie użytkownika)
+  \item sumPrice (cena do koszyka łączna)
+  \item reservations (koszyk z rezerwacjami użytkownika)
   
 \end{itemize}
 
@@ -332,7 +405,7 @@ Katalog ze ścieżkami
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{routes.png}
-\caption{routes katalog}
+\caption{Katalog routes}
 \label{fig:obrazek routes}
 \end{figure}
 
@@ -346,27 +419,29 @@ Katalog ze ścieżkami
 \hline
 GET & /api/admin/users & Zwraca wszystkich użytkowników\\
 \hline
-GET & /api/admin/users/:userId & Zwraca usera o podanym ID\\
+GET & /api/admin/users/:userId & Zwraca użytkownika o podanym ID\\
+\hline
+DELETE & /api/admin/users/:userId & Usuwa użytkownika o podanym ID\\
 \hline
 GET & /api/admin/reservations & Zwraca wszystkie rezerwacje\\
 \hline
+POST & /api/admin/reservations & Blokuje termin rezerwacji\\
+\hline
 GET & /api/admin/reservations/:id & Zwraca rezerwajcę o podanym ID\\
+\hline
+PATCH & /api/admin/reservations/:id & Modyfikuje rezerwajcę o podanym ID\\
 \hline
 DELETE & /api/admin/reservations/:id & Usuwa rezerwajce o podanym ID\\
 \hline
-POST & /api/admin/reservations & Tworzenie rezerwacji jako administrator\\
+GET & /api/admin/courts & Zwraca cennik\\
 \hline
-GET & /api/admin/courts & Zwraca podział boiska dla administratora\\
-\hline
-POST & /api/admin/courts & Tworzenie boiska w panelu administratora\\
+POST & /api/admin/courts & Tworzenie sektora oraz jego cennika w panelu administratora\\
 \hline
 DELETE & /api/admin/courts/:courtId & Usuwanie boiska o danym ID\\
 \hline
 PATCH & /api/admin/courts/:courtId & Modyfikacja boiska\\
 \hline
 GET & /api/admin/courts/:courtId & Zwraca boisko/strefę o podanym ID\\
-\hline
-POST & /api/admin/tariff & Tworzenie cennika\\
 \hline
 GET & /api/admin/priceLists & Zwraca podział cen na wszystkie obiekty\\
 \hline
@@ -413,6 +488,8 @@ POST & /api/forgotPassword & Zapomniane hasło\\
 \hline
 POST & /api/login/:role & Logowanie do panelu administratora\\
 \hline
+POST & /api/checkUser & Sprawdza czy użytkownik jest zalogowan\\
+\hline
 POST & /api/login/ & Logowanie do aplikacji\\
 \hline
 GET & /api/logout & Wylogowanie\\
@@ -446,10 +523,9 @@ POST & /api/getToken & Odbiór tokenu z PAY`U\\
 \hline
 POST & /api/createPayment & Tworzenie płatności\\
 \hline
-POST & /notify & Powiadomienia o sukcesie czy porażce przy dokonowaniu płatności\\
+POST & /api/notify & Powiadomienia z serwisu PayU o sukcesie lub anulowaniu płatności\\
 \hline
-GET & /getPaymentInfo/:orderId & Infromacje o zamówieniu o podanym ID\\
-\hline
+
 
 \end{tabular}
 
@@ -459,14 +535,12 @@ GET & /getPaymentInfo/:orderId & Infromacje o zamówieniu o podanym ID\\
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
 \hline
-GET & /api/reservations & Zwraca wszystkie rezerwację niedostępne do rezerwacji\\
-\hline
-POST & /api/reservations/getPrice & Wylicza koszt całej rezerwacji\\
-\hline
-POST & /api/reservation/create/groups & Tworzenie rezerwacji\\
+GET & /api/reservationsDate & Zwraca wszystkie dostępne godziny dla odpowiedniego sektora w danym dniu\\
 \hline
 GET & /api/reservations/:userId & Rezerwacje użytkownika o danym ID\\
+
 \hline
+POST & /api/reservation/addToBasket & Dodaje rezerwacje do koszyka\\
 
 \end{tabular}
 
@@ -509,14 +583,13 @@ PATCH & /api/updatePasswordViaEmail & Ustawia nowe hasło\\
 
 \hline
 \textbf{Metoda} & \textbf{Endpoint} & \textbf{Opis}\\
-\hline
-GET & /api/checkAuthUser & Sprawdzamy czy użytkownik ma autoryzację\\
+
 \hline
 POST & /api/user/create & Tworzenie nowego użytkownika\\
 \hline
 PATCH & /api/user/update & Aktualizacja danych użytkownika\\
 \hline
-GET & /api/user/:userId & Zwraca użytkownika o podanym ID\\
+GET & /api/getUser/:userId & Zwraca użytkownika o podanym ID\\
 \hline
 
 \end{tabular}
@@ -631,7 +704,7 @@ W katalogu Reservations mieszczą się pliki
 \end{figure}
 
 \subsubsection{Constants}
-Stałe zmienne
+Stałe zmienne do formularzy
 
 \subsubsection{CreateReservations}
 Komponent odpowiedzialny za tworzenie rezerwacji
